@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import {ObjectPicker} from './util'
 
 function BasicWorld(options) {
   Object.assign(this, {
@@ -33,11 +34,11 @@ function BasicWorld(options) {
     wireframe: true
   }))
   this._scene.add(planeMesh)
+  console.log('IOJ')
   planeMesh.position.set(0, 0, -10)
 
 
   this._renderer = new THREE.WebGLRenderer({canvas: this.targetCanvas, antialias: true})
-
 
 
   this.render()
@@ -53,5 +54,15 @@ BasicWorld.prototype = {
 
   render() {
     this._renderer.render(this._scene, this._camera)
+  },
+  add(...objects) {
+    this._scene.add.apply(this._scene, objects)
+  },
+  pick(type,position){
+    let objectPicker = new ObjectPicker(this._camera,this._scene,type)
+    return objectPicker.pick(position)
   }
 }
+
+
+export default BasicWorld
