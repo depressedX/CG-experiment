@@ -15,7 +15,7 @@ function WordOfPolygon(options) {
 
     basicWorld= new BasicWorld({targetCanvas})
 
-    let dot = new util.DotPlusMesh(new util.DotPlus(50))
+    let dot = new util.DotPlusMesh(new util.DotPlus(10))
     dot.position.set(0, 0, 0)
     basicWorld.add(dot)
 
@@ -37,7 +37,9 @@ function WordOfPolygon(options) {
   function mouseMoveHandler(event) {
     let mouse = util.getPositionInUnitAxis(event)
     let pickdedDot = basicWorld.pick(util.DotPlusMesh,mouse)[0]
-    console.log(pickdedDot)
+    if (pickdedDot) {
+      console.log(pickdedDot)
+    }
     if (pickdedDot) {
       if (activeDot) {
         activeDot.inActive()

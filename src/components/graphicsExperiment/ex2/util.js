@@ -12,8 +12,10 @@ DotPlus.prototype = Object.assign(Object.create(THREE.CircleGeometry.prototype),
 
 
 function DotPlusMesh(dotPlus) {
-  let material = new THREE.MeshBasicMaterial({color: DotPlusMesh.prototype.normalColor})
+  let material = new THREE.MeshBasicMaterial({transparent:true})
   THREE.Mesh.call(this, dotPlus, material)
+  this.isActive = true
+  this.inActive()
 
 }
 
@@ -22,10 +24,16 @@ DotPlusMesh.prototype = Object.assign(Object.create(THREE.Mesh.prototype), {
   constructor: DotPlusMesh,
 
   active() {
+    if (this.isActive) return
     this.material.color.set(this.activeColor)
+    // this.material.opacity = 1
+    this.isActive = true
   },
   inActive() {
+    if (!this.isActive) return
     this.material.color.set(this.normalColor)
+    // this.material.opacity = 0
+    this.isActive = false
   },
   activeColor: new THREE.Color(255, 0, 0),
   normalColor: new THREE.Color(255, 255, 255)
@@ -34,6 +42,7 @@ DotPlusMesh.prototype = Object.assign(Object.create(THREE.Mesh.prototype), {
 
 function ObjectPicker(camera, scene, type) {
   this.raycaster = new THREE.Raycaster()
+  this.raycaster.near = 50
   this.type = type
   this.scene = scene
   this.camera = camera
