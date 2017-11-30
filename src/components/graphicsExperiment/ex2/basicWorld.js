@@ -56,7 +56,10 @@ BasicWorld.prototype = {
     this._renderer.render(this._scene, this._camera)
   },
   add(...objects) {
-    this._scene.add.apply(this._scene, objects)
+    return this._scene.add.apply(this._scene, objects)
+  },
+  remove(...objects){
+    return this._scene.remove.apply(this._scene,objects)
   },
   pick(type,position){
     let objectPicker = new ObjectPicker(this._camera,this._scene,type)

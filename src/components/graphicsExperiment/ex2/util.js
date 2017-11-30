@@ -36,12 +36,16 @@ DotPlusMesh.prototype = Object.assign(Object.create(THREE.Mesh.prototype), {
     this.isActive = false
   },
   activeColor: new THREE.Color(255, 0, 0),
-  normalColor: new THREE.Color(255, 255, 255)
+  normalColor: new THREE.Color(255, 255, 255),
+  getVectorRepresented(){
+    return new THREE.Vector3(this.position.x,this.position.y,this.position.z)
+  }
 });
 
 
 function ObjectPicker(camera, scene, type) {
   this.raycaster = new THREE.Raycaster()
+  this.raycaster.linePrecision = 50
   this.raycaster.near = 50
   this.type = type
   this.scene = scene
