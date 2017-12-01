@@ -3,6 +3,7 @@ import * as util from './util'
 import BasicWorld from './basicWorld'
 import EventEmitter from 'events'
 import consts from './consts'
+import polygonStore from './polygonStore'
 
 function WordOfPolygon(options) {
   let basicWorld = null
@@ -15,9 +16,13 @@ function WordOfPolygon(options) {
 
   let state = consts.DISPLAY
 
-  let dotPathStack = []
+  // 当前正在绘制的图形的相关变量
+  let dotStack = []
   let lineStack = []
   let curLine = null
+
+  let shapeColor = new THREE.Color(1, 1, 1)
+
 
   function wordOfPolygon(options) {
 
@@ -35,6 +40,8 @@ function WordOfPolygon(options) {
       mouseAction.emit('click', e)
     }))
 
+    polygonStore.takeOver(basicWorld)
+
 
     // 高亮移动到的点
     mouseAction.on('move', highlightDotPicked)
@@ -49,9 +56,28 @@ function WordOfPolygon(options) {
     constructor: wordOfPolygon,
 
     createNewShape() {
-      this.state = consts.CREATE
-      this.dotPathStack = []
-      this.lineStack = []
+      state = consts.CREATE
+      clearWorkingStash()
+      basicWorld.render()
+    },
+    display() {
+      state = consts.DISPLAY
+      clearWorkingStash()
+      basicWorld.render()
+    },
+    edit() {
+      state = consts.EDIT
+      clearWorkingStash()
+      basicWorld.render()
+    },
+    setColor(r, g, b, a) {
+      shapeColor = new THREE.Color(r / 255, g / 255, b / 255)
+    },
+    downloadSavedPolygon() {
+      createAndDownloadFile('data.txt', JSON.stringify(polygonStore.serialize()))
+    },
+    serializeSavedPolygon() {
+      return polygonStore.serialize()
     }
   }
 
@@ -76,28 +102,41 @@ function WordOfPolygon(options) {
   }
 
   function updateDotState(event) {
+    console.log(state)
+
+    if (state!==consts.CREATE) return
+
     let pickedDot = getPickedDotFromMouseEvent(event)
     if (pickedDot) {
-      // 选中了栈中某个点
-      // 弹栈
-      let  curDot = null,
-        forwardLine = null
-      do {
-        curDot = dotPathStack.pop()
-        forwardLine = lineStack.pop()
-        basicWorld.remove(forwardLine)
-        basicWorld.remove(curDot)
-      }while (curDot!==pickedDot)
-      dotPathStack.push(curDot)
-      basicWorld.add(curDot)
-      if (forwardLine){
-        lineStack.push(forwardLine)
-        basicWorld.add(forwardLine)
+      // 如果选中的是第一个点 则认为已经完成该多边形的绘制
+      if (pickedDot === dotStack[0]) {
+        let vertices = dotStack.map(dot => dot.getVectorRepresented())
+        clearWorkingStash()
+
+        // 存入store中
+        polygonStore.addPolygon(vertices, shapeColor)
+
+      } else {
+        // 选中了栈中某个点
+        // 弹栈
+        let curDot = null,
+          forwardLine = null
+        do {
+          curDot = dotStack.pop()
+          forwardLine = lineStack.pop()
+          basicWorld.remove(forwardLine)
+          basicWorld.remove(curDot)
+        } while (curDot !== pickedDot)
+        dotStack.push(curDot)
+        basicWorld.add(curDot)
+        if (forwardLine) {
+          lineStack.push(forwardLine)
+          basicWorld.add(forwardLine)
+        }
+        curLine.geometry.vertices[0] = curDot.getVectorRepresented()
+        curLine.geometry.verticesNeedUpdate = true
+
       }
-      curLine.geometry.vertices[0].set(curDot.getVectorRepresented().x,curDot.getVectorRepresented().y,curDot.getVectorRepresented().z)
-      curLine.geometry.verticesNeedUpdate = true
-
-
     } else {
       // 新建一个dot和一条边 更新相关数据
       let axis = util.getPositionInUnitAxis(event)
@@ -106,22 +145,22 @@ function WordOfPolygon(options) {
       if (!curLine) {
         // 栈顶为空
         let lineGeo = new THREE.Geometry()
-        lineGeo.vertices.push(newDot.getVectorRepresented(),newDot.getVectorRepresented())
+        lineGeo.vertices.push(newDot.getVectorRepresented(), newDot.getVectorRepresented())
         curLine = new THREE.Line(lineGeo)
         basicWorld.add(curLine)
 
         basicWorld.add(newDot)
-        dotPathStack.push(newDot)
+        dotStack.push(newDot)
       } else {
         // 栈中有元素
         lineStack.push(curLine)
         let lineGeo = new THREE.Geometry()
-        lineGeo.vertices.push(newDot.getVectorRepresented(),newDot.getVectorRepresented())
+        lineGeo.vertices.push(newDot.getVectorRepresented(), newDot.getVectorRepresented())
         curLine = new THREE.Line(lineGeo)
         basicWorld.add(curLine)
 
         basicWorld.add(newDot)
-        dotPathStack.push(newDot)
+        dotStack.push(newDot)
 
 
       }
@@ -132,6 +171,7 @@ function WordOfPolygon(options) {
   }
 
   function updateCurLineEnd(event) {
+    if (state!==consts.CREATE) return
     if (!curLine) return
     let axis = util.getPositionInUnitAxis(event)
     let newEnd = new THREE.Vector3(axis.x * basicWorld.resolution / 2, axis.y * basicWorld.resolution * basicWorld.aspect / 2, 0)
@@ -143,6 +183,35 @@ function WordOfPolygon(options) {
 
   function getPickedDotFromMouseEvent(event) {
     return basicWorld.pick(util.DotPlusMesh, util.getPositionInUnitAxis(event))[0]
+  }
+
+  function clearWorkingStash() {
+    dotStack.forEach(dot => {
+      basicWorld.remove(dot)
+    })
+    dotStack = []
+
+    lineStack.forEach(line => {
+      basicWorld.remove(line)
+    })
+    lineStack = []
+
+    basicWorld.remove(curLine)
+    curLine = null
+  }
+
+  /**
+   * 创建并下载文件
+   * @param  {String} fileName 文件名
+   * @param  {String} content  文件内容
+   */
+  function createAndDownloadFile(fileName, content) {
+    var aTag = document.createElement('a');
+    var blob = new Blob([content]);
+    aTag.download = fileName;
+    aTag.href = URL.createObjectURL(blob);
+    aTag.click();
+    URL.revokeObjectURL(blob);
   }
 
 

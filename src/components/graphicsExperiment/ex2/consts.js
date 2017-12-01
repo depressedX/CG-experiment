@@ -1,7 +1,10 @@
-let DISPLAY = Symbol('display')
-let CREATE = Symbol('create')
+let DISPLAY = Symbol('display'),
+  CREATE = Symbol('create'),
+  EDIT = Symbol('edit')
+
 
 export default {
   DISPLAY,
-  CREATE
+  CREATE,
+  EDIT
 }
