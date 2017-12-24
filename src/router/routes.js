@@ -2,7 +2,7 @@ import App from '../App.vue'
 import Index from '../page/index/Index.vue'
 import Demo from '../page/demo/Demo.vue'
 import DemoDeault from '../page/demo/DemoDefault.vue'
-import About from '../components/about/About.vue'
+import About from '../page/about/About.vue'
 
 import experimentInfo from '../components/graphicsExperiment'
 
