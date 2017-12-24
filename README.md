@@ -1,6 +1,8 @@
-# graphics-experiment
+> 大二图形学实验
 
-> study graphics with threejs
+**不想学C++**,于是用了js
+
+基于Vue-cli构建 使用了**threejs**+**Vue**+**Vue-router**+**Element-ui**
 
 ## Build Setup
 
@@ -17,5 +19,3 @@ npm run build
 # build for production and view the bundle analyzer report
 npm run build --report
 ```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
