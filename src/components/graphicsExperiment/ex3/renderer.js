@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import {TRACK_SIZE,ASPECT} from "./consts"
 import './refreshController'
-import {OrbitControls} from "./OrbitControls";
+import {OrbitControls} from "../../../lib/OrbitControls";
 import {camera} from "./camera";
 
 let renderer = null

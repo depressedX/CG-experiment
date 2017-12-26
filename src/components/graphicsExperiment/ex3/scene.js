@@ -2,6 +2,12 @@ import * as THREE from 'three'
 import Track from './objects/Track'
 import consts, {ASPECT, TRACK_SIZE} from './consts'
 import Ground from "./objects/Ground";
+import {OBJLoader} from "../../../lib/OBJLoader";
+import {MTLLoader} from "../../../lib/MTLLoader";
+import testMtl from '../../../assets/objects/test2.mtl'
+import testObj from '../../../assets/objects/test2.obj'
+import papyrus from '../../../assets/objects/papyrus.jpg'
+console.log(papyrus)
 
 const scene= new THREE.Scene()
 
@@ -30,7 +36,22 @@ ground.rotateX(-Math.PI/2)
 scene.add(ground)
 
 
+let objLoader = new OBJLoader()
+let mtlLoader = new MTLLoader()
+mtlLoader.setTexturePath('/static/img/')
+mtlLoader.load( testMtl, function( materials ) {
 
+    materials.preload();
+
+    objLoader.setMaterials( materials );
+    objLoader.load( testObj, function ( object ) {
+
+        // object.position.y = - 95;
+        scene.add( object );
+
+    } );
+
+});
 
 
 

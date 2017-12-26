@@ -10,7 +10,9 @@ function switchCamera(camera) {
 
 
 function render(timeStamp) {
-    renderer.render(scene,curCamera)
+    if (renderer) {
+        renderer.render(scene, curCamera)
+    }
     requestAnimationFrame(render)
 }
 requestAnimationFrame(render)

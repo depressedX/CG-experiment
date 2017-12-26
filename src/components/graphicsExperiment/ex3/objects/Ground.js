@@ -13,7 +13,6 @@ function Ground() {
         texture.wrapS = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
         texture.repeat.set( 20, 20 );
-        console.log(this.material)
     })
 }
 
