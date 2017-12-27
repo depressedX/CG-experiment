@@ -1,0 +1,16 @@
+let objLoader = new OBJLoader()
+let mtlLoader = new MTLLoader()
+mtlLoader.setTexturePath('/static/img/')
+mtlLoader.load( testMtl, function( materials ) {
+
+    materials.preload();
+
+    objLoader.setMaterials( materials );
+    objLoader.load( testObj, function ( object ) {
+
+        // object.position.y = - 95;
+        scene.add( object );
+
+    } );
+
+});
