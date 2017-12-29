@@ -54,7 +54,7 @@ Vehicle.prototype = {
     /****************************************************************/
     /*                       发动机相关量                          */
     /****************************************************************/
-    engineIdleOutputF: 10,//发动机怠速时输出力F  可看做是功率的简化
+    engineIdleOutputF: 100,//发动机怠速时输出力F  可看做是功率的简化
     maxEngineeOutputF: 10000,//发动机最大输出力
     engineGearRadius: 3,//发动机齿轮半径
     engineFrictionFactor: 1.1,//发动机摩擦系数
@@ -63,7 +63,7 @@ Vehicle.prototype = {
     curEngineOutputF: 0,//发动机当前输出力F
     curEngineGearSpeed: 0,//发动机齿轮当前速度
     get curEngineGearFriction() {//发动机当前内部的摩擦力
-        return this.engineFrictionFactor * this.engineGearRadius * this.curEngineSpeed
+        return this.engineFrictionFactor * this.engineGearRadius * this.curEngineGearSpeed
     },
     get curEngineGearAcceleration() {//发动机当前加速度
         return this.curEngineOutputF - this.curEngineGearFriction - this.curTransmissionF
@@ -74,14 +74,14 @@ Vehicle.prototype = {
     /*                       变速箱相关量                          */
     /****************************************************************/
     maxGear: 5,//变速箱最大档位
-    gearRadius: [20, 15, 10, 7, 3],//各档位齿轮半径
+    gearRadius: [0, 20, 15, 10, 7, 3],//各档位齿轮半径
     muTape: 0.12,//和发动机连接处的摩擦系数mu
     maxClutchEngagementF: 1000,//离合器最大咬合压力
 
     //离合器当前咬合率 1完全联动 0完全不联动  影响发动机向变速箱输出的F1的大小
     curClutchEngagementRate: 0,
     curGear: 0,//当前档位
-    get curClutchEngagementF() {//离合器当前咬合力
+    get curClutchEngagementF() {//离合器当前咬合压力
         return this.curClutchEngagementRate * this.maxClutchEngagementF
     },
     get curBreakoutFriction() {//当前和发动机连接处最大静摩擦力
@@ -112,17 +112,21 @@ Vehicle.prototype = {
     /****************************************************************/
     // 车重
     get vehicleWeight() {
-        return this.mesh.components.body.params.width * 100
+        // return this.mesh.components.body.params.width * 100
+        return 1500
     },
+    initialFriction: 50,//固有摩擦
 
 
     curVehicleSpeed: 0,//当前车辆速度
     get curVehicleAcceleration() {//当前车辆加速度
         // 来自变速箱的动力-车辆受到的风阻
-        return this.curBackWheelF - this.curVehicleDragF
+        return this.curBackWheelF - this.curVehicleDragF - (this.curVehicleSpeed > 0 ? this.initialFriction : 0)
     },
     // 当前车辆方向 初始时朝向X轴正方向
     curVehicleOrientation: new THREE.Vector3(1, 0, 0),
+
+
 
 
     /****************************************************************/
@@ -174,6 +178,14 @@ Vehicle.prototype = {
         }
         this.curEngineOutputF = this.engineIdleOutputF + this.maxEngineeOutputF * value
     },
+    // 离合位置
+    clutch(value) {
+        if (value < 0 || value > 1) {
+            console.log('离合输入不合法')
+            return
+        }
+        this.curClutchEngagementRate = value
+    },
 
 
     /****************************************************************/
@@ -184,14 +196,12 @@ Vehicle.prototype = {
      * @private
      */
     _checkVehicleState() {
-        console.log('checking')
     },
     /***
      * 根据车辆各零件的信息更新车辆状态
      * @private
      */
     _updateState() {
-        console.log('updating')
 
         // 刷新间隔  s为单位
         let interval = 1 / this.TPS
@@ -201,7 +211,9 @@ Vehicle.prototype = {
          * 各部件速度Vt = V0 + at
          */
         this.curEngineGearSpeed += this.curEngineGearAcceleration * interval
+        this.curEngineGearSpeed = Math.max(0,this.curEngineGearSpeed)
         this.curVehicleSpeed += this.curVehicleAcceleration * interval
+        this.curVehicleSpeed = Math.max(0,this.curVehicleSpeed)
 
         // 车辆位移
         let angleX = this.curVehicleOrientation.angleTo(new THREE.Vector3(1, 0, 0)),
