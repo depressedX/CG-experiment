@@ -1,4 +1,10 @@
+/***
+ * @author lph
+ * @description 车身的Object3D对象
+ */
+
 import * as THREE from 'three'
+
 
 // 单向的对象的值覆盖
 let oneWayCover = (...objects) => {

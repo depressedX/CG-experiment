@@ -1,3 +1,7 @@
+/***
+ * @author lph
+ * @description 车轮的Object3D对象
+ */
 import * as THREE from 'three'
 import wheelBumpMap from '../../../../../assets/objects/wheel_bump_map.jpg'
 import wheelColorMap from '../../../../../assets/objects/wheel_color_map.png'

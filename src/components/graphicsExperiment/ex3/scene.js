@@ -28,9 +28,8 @@ ground.rotateX(-Math.PI/2)
 scene.add(ground)
 
 
-let vehicle = new Vehicle()
-console.log(vehicle)
-scene.add(vehicle.mesh)
+// let vehicle = new Vehicle()
+// scene.add(vehicle.mesh)
 
 
 
