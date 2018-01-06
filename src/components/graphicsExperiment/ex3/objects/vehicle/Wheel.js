@@ -30,9 +30,6 @@ function Wheel(params) {
     frontMesh.position.set(0,0,params.width/2)
 
     this.add(sideMesh,frontMesh2,frontMesh)
-
-
-
 }
 Wheel.prototype = Object.assign(Object.create(THREE.Group.prototype),{
     constructor:Wheel

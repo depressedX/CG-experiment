@@ -3,7 +3,8 @@ import Track from './objects/Track'
 import consts from './consts'
 import Ground from "./objects/Ground";
 
-import {Vehicle} from "./objects/vehicle/Vehicle";
+import {SimplifiedVehicle} from "./objects/vehicle/Vehicle";
+import {Wheel} from "./objects/vehicle/Wheel";
 
 const scene= new THREE.Scene()
 
@@ -28,9 +29,8 @@ ground.rotateX(-Math.PI/2)
 scene.add(ground)
 
 
-let vehicle = new Vehicle()
+let vehicle = new SimplifiedVehicle()
 scene.add(vehicle.mesh)
-
 
 
 export { scene,vehicle}

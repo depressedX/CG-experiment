@@ -16,6 +16,16 @@
 </template>
 
 <script>
+    /*
+    为第一代汽车设计的控制面板
+    可发出的事件:
+    @acceleration
+    @startUp
+    @clutch
+    @switch
+     */
+
+
     function getOffset(dom) {
         let mouse = {};
         let canvasPosition = getElementPosition(dom)

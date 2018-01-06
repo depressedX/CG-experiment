@@ -247,4 +247,187 @@ Vehicle.prototype = {
     }
 }
 
-export {Vehicle}
+
+/***
+ * 简化的汽车
+ * @constructor
+ */
+function SimplifiedVehicle() {
+    this.mesh = new VehicleMesh()
+
+    this._startUpdate()
+}
+// 车辆状态
+let states = {
+    BRAKING:-1,
+    IDLE:0,
+    ACCELERATING:1
+}
+let steerState = {
+    LEFT:-1,
+    STRAIGHT:0,
+    RIGHT:1
+}
+SimplifiedVehicle.prototype = {
+    constructor:SimplifiedVehicle,
+
+    // 车重
+    get vehicleWeight() {
+        // return this.mesh.components.body.params.width * 100
+        return 1500
+    },
+
+    //汽车最高速km/h
+    maxSpeed:80,
+    minSpeed:-30,
+    // 发动机输出
+    engineOutputF:70,
+    //刹车制动力
+    brakeDragF:50,
+    // 地面以及空气阻力
+    groundDragF:20,
+    // 后轮最大转向角度
+    maxFrontSteelRotationAngle:Math.PI/4,
+
+
+    BRAKING:states.BRAKING,
+    IDLE:states.IDLE,
+    ACCELERATING:states.ACCELERATING,
+
+    LEFT:steerState.LEFT,
+    STRAIGHT:steerState.STRAIGHT,
+    RIGHT:steerState.RIGHT,
+
+
+    //当前汽车加速度
+    get curAcceleration(){
+        if (this.curState===states.ACCELERATING&&this.curSpeed>=this.maxSpeed||
+            this.curState===states.BRAKING&&this.curSpeed<=this.minSpeed)
+            return 0
+        let result=0
+        if (this.curSpeed!==0) result+=(this.curSpeed>0?-1:1)*this.groundDragF
+        if (this.curState===states.ACCELERATING) {
+            result+=this.engineOutputF
+        }
+        else if (this.curState===states.BRAKING){
+            result-=this.brakeDragF
+        }
+
+
+        return Math.round(result*100)/100
+
+    },
+    //当前速度
+    curSpeed:0,
+    // 当前转向状态
+    curSteerState:steerState.STRAIGHT,
+    // 当前车辆状态
+    curState:states.IDLE,
+    //当前车辆朝向  初始x轴正方向
+    curOrientation:new THREE.Vector3(1,0,0),
+
+
+
+    /****************************************************************/
+    /*                       内部clock相关量                          */
+    /****************************************************************/
+    TPS: 20,//每秒更新多少次
+    timer: null,
+
+
+    /****************************************************************/
+    /*                       对外暴露的方法                          */
+    /****************************************************************/
+    //前进
+    accelerate() {
+        this.curState = states.ACCELERATING
+    },
+    //刹车
+    brake(){
+        this.curState = states.BRAKING
+    },
+    // 空状态
+    release(){
+        this.curState = states.IDLE
+    },
+    turnLeft(){
+        console.log('left')
+        this.curSteerState = steerState.LEFT
+        this.mesh.components.frontWheel1.rotation.set(0,this.maxFrontSteelRotationAngle,0)
+        this.mesh.components.frontWheel2.rotation.set(0,this.maxFrontSteelRotationAngle,0)
+    },
+    turnRight(){
+        this.curSteerState = steerState.RIGHT
+        this.mesh.components.frontWheel1.rotation.set(0,-this.maxFrontSteelRotationAngle,0)
+        this.mesh.components.frontWheel2.rotation.set(0,-this.maxFrontSteelRotationAngle,0)
+    },
+    goStraight(){
+        console.log('strarght')
+        this.curSteerState = steerState.STRAIGHT
+        this.mesh.components.frontWheel1.rotation.set(0,0,0)
+        this.mesh.components.frontWheel2.rotation.set(0,0,0)
+    },
+
+
+    /****************************************************************/
+    /*                       私有方法                          */
+    /****************************************************************/
+    /***
+     * 根据车辆各零件的信息更新车辆状态
+     * @private
+     */
+    _updateState() {
+
+        // 刷新间隔  s为单位
+        let interval = 1 / this.TPS
+
+        /**
+         * 更新速度
+         */
+        this.curSpeed += this.curAcceleration*interval
+        // 根据前轮朝向更新朝向
+        if (this.curSteerState===steerState.LEFT) {
+            this.mesh.rotateY(interval/3)
+            this.curOrientation.applyAxisAngle(new THREE.Vector3(0, 1, 0), interval/3)
+        }else if(this.curSteerState===steerState.RIGHT) {
+            this.mesh.rotateY(-interval/3)
+            this.curOrientation.applyAxisAngle(new THREE.Vector3(0, 1, 0), -interval/3)
+        }
+
+
+
+        // 车辆位移
+        let angleX = this.curOrientation.angleTo(new THREE.Vector3(1, 0, 0)),
+            angleY = this.curOrientation.angleTo(new THREE.Vector3(0, 1, 0)),
+            angleZ = this.curOrientation.angleTo(new THREE.Vector3(0, 0, 1))
+        this.mesh.position.x += this.curSpeed * interval * Math.cos(angleX)
+        this.mesh.position.y += this.curSpeed * interval * Math.cos(angleY)
+        this.mesh.position.z += this.curSpeed * interval * Math.cos(angleZ)
+
+    },
+    /***
+     * 开始设置timer更新汽车状态
+     * @private
+     */
+    _startUpdate() {
+        if (this.timer) {
+            return
+        }
+        this.timer = setInterval(() => {
+            this._updateState()
+        }, this.TPS)
+    },
+    /***
+     * 暂停更新
+     * @private
+     */
+    _endUpdate() {
+        clearInterval(this.timer)
+        this.timer = null
+    }
+}
+
+
+
+
+export {Vehicle,SimplifiedVehicle}
