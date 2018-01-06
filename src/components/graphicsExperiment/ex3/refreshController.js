@@ -1,8 +1,8 @@
 import {scene} from "./scene";
-import {camera} from "./camera";
+import {camera,followUpCamera} from "./camera";
 import {renderer} from "./renderer";
 
-let curCamera = camera
+let curCamera = followUpCamera
 
 function switchCamera(camera) {
     curCamera = camera

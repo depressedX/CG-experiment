@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import {Body} from "./Body";
 import {Wheel} from "./Wheel";
+import {updateFollowUpCamera} from "../../camera";
 
 function VehicleMesh() {
     THREE.Group.call(this)
@@ -278,14 +279,14 @@ SimplifiedVehicle.prototype = {
     },
 
     //汽车最高速km/h
-    maxSpeed:80,
-    minSpeed:-30,
+    maxSpeed:180,
+    minSpeed:-70,
     // 发动机输出
-    engineOutputF:70,
+    engineOutputF:150,
     //刹车制动力
-    brakeDragF:50,
+    brakeDragF:100,
     // 地面以及空气阻力
-    groundDragF:20,
+    groundDragF:50,
     // 后轮最大转向角度
     maxFrontSteelRotationAngle:Math.PI/4,
 
@@ -351,7 +352,6 @@ SimplifiedVehicle.prototype = {
         this.curState = states.IDLE
     },
     turnLeft(){
-        console.log('left')
         this.curSteerState = steerState.LEFT
         this.mesh.components.frontWheel1.rotation.set(0,this.maxFrontSteelRotationAngle,0)
         this.mesh.components.frontWheel2.rotation.set(0,this.maxFrontSteelRotationAngle,0)
@@ -362,7 +362,6 @@ SimplifiedVehicle.prototype = {
         this.mesh.components.frontWheel2.rotation.set(0,-this.maxFrontSteelRotationAngle,0)
     },
     goStraight(){
-        console.log('strarght')
         this.curSteerState = steerState.STRAIGHT
         this.mesh.components.frontWheel1.rotation.set(0,0,0)
         this.mesh.components.frontWheel2.rotation.set(0,0,0)
@@ -381,17 +380,19 @@ SimplifiedVehicle.prototype = {
         // 刷新间隔  s为单位
         let interval = 1 / this.TPS
 
+
         /**
          * 更新速度
          */
         this.curSpeed += this.curAcceleration*interval
         // 根据前轮朝向更新朝向
+        let angle = interval*this.curSpeed/200
         if (this.curSteerState===steerState.LEFT) {
-            this.mesh.rotateY(interval/3)
-            this.curOrientation.applyAxisAngle(new THREE.Vector3(0, 1, 0), interval/3)
+            this.mesh.rotateY(angle)
+            this.curOrientation.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle)
         }else if(this.curSteerState===steerState.RIGHT) {
-            this.mesh.rotateY(-interval/3)
-            this.curOrientation.applyAxisAngle(new THREE.Vector3(0, 1, 0), -interval/3)
+            this.mesh.rotateY(-angle)
+            this.curOrientation.applyAxisAngle(new THREE.Vector3(0, 1, 0), -angle)
         }
 
 
@@ -415,7 +416,8 @@ SimplifiedVehicle.prototype = {
         }
         this.timer = setInterval(() => {
             this._updateState()
-        }, this.TPS)
+            updateFollowUpCamera(this)
+        }, 1000/this.TPS)
     },
     /***
      * 暂停更新

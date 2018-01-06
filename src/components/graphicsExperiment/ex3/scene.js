@@ -32,5 +32,7 @@ scene.add(ground)
 let vehicle = new SimplifiedVehicle()
 scene.add(vehicle.mesh)
 
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(50)))
+
 
 export { scene,vehicle}
