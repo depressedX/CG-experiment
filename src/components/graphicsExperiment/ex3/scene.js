@@ -1,10 +1,11 @@
 import * as THREE from 'three'
 import Track from './objects/Track'
-import consts from './consts'
+import consts, {SCENE_DEPTH, SCENE_HEIGHT, SCENE_WIDTH} from './consts'
 import Ground from "./objects/Ground";
 
 import {SimplifiedVehicle} from "./objects/vehicle/Vehicle";
-import {Wheel} from "./objects/vehicle/Wheel";
+
+
 
 const scene= new THREE.Scene()
 
@@ -32,7 +33,8 @@ scene.add(ground)
 let vehicle = new SimplifiedVehicle()
 scene.add(vehicle.mesh)
 
-scene.add(new THREE.Mesh(new THREE.SphereGeometry(50)))
+
+
 
 
 export { scene,vehicle}

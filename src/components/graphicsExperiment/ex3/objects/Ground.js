@@ -1,11 +1,12 @@
 import * as THREE from 'three'
 import grassImage from '../../../../assets/grass.jpg'
+import {SCENE_DEPTH, SCENE_WIDTH} from "../consts";
 
 
 const textureLoader = new THREE.TextureLoader()
 
 function Ground() {
-    let planeGeometry = new THREE.PlaneGeometry(1000, 1000)
+    let planeGeometry = new THREE.PlaneGeometry(SCENE_WIDTH, SCENE_DEPTH)
 
     THREE.Mesh.call(this, planeGeometry, new THREE.MeshLambertMaterial({color:new THREE.Color(1,1,1),side:THREE.DoubleSide}))
     textureLoader.load(grassImage, texture => {

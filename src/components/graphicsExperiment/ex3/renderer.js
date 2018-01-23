@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import {TRACK_SIZE,ASPECT} from "./consts"
 import './refreshController'
 import {OrbitControls} from "../../../lib/OrbitControls";
-import {camera,followUpCamera} from "./camera";
+import {fullSceneCamera,followUpCamera} from "./camera";
 
 let renderer = null
 
@@ -14,8 +14,8 @@ function init(params) {
     renderer.setClearColor(new THREE.Color(.9,.9,.9),1)
 
 
-    // 自由视角控制
-    // let controls = new OrbitControls( camera, params.canvas);
+    // // 自由视角控制
+    // let controls = new OrbitControls( fullSceneCamera, params.canvas);
     // controls.enableZoom = true;
 }
 

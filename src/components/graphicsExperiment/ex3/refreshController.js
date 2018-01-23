@@ -1,11 +1,15 @@
 import {scene} from "./scene";
-import {camera,followUpCamera} from "./camera";
+import {fullSceneCamera,followUpCamera} from "./camera";
 import {renderer} from "./renderer";
 
 let curCamera = followUpCamera
 
 function switchCamera(camera) {
-    curCamera = camera
+    if (camera===undefined){
+        curCamera = curCamera===fullSceneCamera?followUpCamera:fullSceneCamera
+    }else {
+        curCamera = camera
+    }
 }
 
 
