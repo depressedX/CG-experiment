@@ -2,6 +2,8 @@
 
 **不想学C++**,于是用了js
 
+[演示地址](http://211.159.152.107/graphicsExperiment/)
+
 基于Vue-cli构建 使用了**threejs**+**Vue**+**Vue-router**+**Element-ui**
 
 ## Build Setup
