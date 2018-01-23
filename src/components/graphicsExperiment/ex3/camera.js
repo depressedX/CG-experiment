@@ -3,10 +3,10 @@ import {TRACK_SIZE, ASPECT, FOV} from "./consts"
 // import {vehicle} from "./scene";
 
 
-const offsetCamera = 100
-const camera = new THREE.PerspectiveCamera(FOV, ASPECT, 1, offsetCamera * 2)
-camera.lookAt(new THREE.Vector3(0, 0, -10))
-camera.position.set(0, 0, offsetCamera)
+// const offsetCamera = 100
+// const camera = new THREE.PerspectiveCamera(FOV, ASPECT, 1, offsetCamera * 2)
+// camera.lookAt(new THREE.Vector3(0, 0, -10))
+// camera.position.set(0, 0, offsetCamera)
 
 
 const fullSceneCamera = new THREE.OrthographicCamera(-TRACK_SIZE, TRACK_SIZE, TRACK_SIZE / ASPECT, -TRACK_SIZE / ASPECT, 1, 10000)

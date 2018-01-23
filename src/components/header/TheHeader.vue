@@ -12,7 +12,7 @@
       <router-link :to="{name:'demo'}" class="catagory__item">Demo</router-link>
     </el-menu-item>
     <el-menu-item index="3">
-      <router-link :to="{name:'about'}" class="catagory__item">关于我</router-link>
+      <router-link :to="{name:'about'}" class="catagory__item">关于</router-link>
     </el-menu-item>
   </el-menu>
 </template>
